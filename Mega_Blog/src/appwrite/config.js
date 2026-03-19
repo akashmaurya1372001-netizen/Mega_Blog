@@ -73,4 +73,18 @@ export class Service {
       return false;
     }
   }
+
+  async getPosts(queries = [Query.equal("status", "active")]) {
+    try {
+      return await this.databases.listDocuments(
+        confi.appwriteDatabaseId,
+        confi.appwriteCollectionId,
+        queries,
+      );
+    } catch (error) {
+      console.log("Appwrite serive :: getPosts :: error", error);
+      return false;
+    }
+  }
+  // file uploded here
 }
