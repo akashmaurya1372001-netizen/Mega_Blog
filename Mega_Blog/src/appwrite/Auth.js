@@ -33,7 +33,15 @@ export class AuthService {
             throw error;
         }
     }
-}
 
-const authService= new AuthService();
+     async getCurrentUser() {
+        try {
+            return await this.account.get();
+        } catch (error) {
+            console.log("Appwrite serive :: getCurrentUser :: error", error);
+        }
+
+        return null;
+    }
+}const authService= new AuthService();
 export default authService;
