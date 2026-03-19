@@ -92,7 +92,7 @@ export class Service {
       return await this.bucket.createFile(
         confi.appwriteBucketId,
         ID.unique(),
-        file,
+        file
       );
     } catch (error) {
       console.log("Appwrite serive :: uploadFile :: error", error);
@@ -101,7 +101,7 @@ export class Service {
   }
   async deleteFile(fileId) {
     try {
-      await this.bucket.deleteFile(conf.appwriteBucketId, fileId);
+      await this.bucket.deleteFile(confi.appwriteBucketId, fileId);
       return true;
     } catch (error) {
       console.log("Appwrite serive :: deleteFile :: error", error);
@@ -112,3 +112,6 @@ export class Service {
     return this.bucket.getFilePreview(confi.appwriteBucketId, fileId);
   }
 }
+
+const service = new Service()
+export default service;
