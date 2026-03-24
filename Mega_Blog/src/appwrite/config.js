@@ -22,7 +22,7 @@ export class Service {
         confi.appwriteDatabaseId,
         confi.appwriteCollectionId,
         slug,
-        {
+       { 
           title,
           content,
           featuredImage,
