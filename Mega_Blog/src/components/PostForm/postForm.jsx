@@ -1,20 +1,19 @@
-import React, { useCallback } from "react";
-import { useForm } from "react-hook-form";
+import React, { useCallback, useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { Button, Input, RTE, Select } from "..";
 import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 export default function PostForm({ post }) {
-  const { register, handleSubmit, watch, setValue, control, getValues } =
-    useForm({
-      defaultValues: {
-        title: post?.title || "",
-        slug: post?.$id || "",
-        content: post?.content || "",
-        status: post?.status || "active",
-      },
-    });
+  const { register, handleSubmit, setValue, control, getValues } = useForm({
+    defaultValues: {
+      title: post?.title || "",
+      slug: post?.$id || "",
+      content: post?.content || "",
+      status: post?.status || "active",
+    },
+  });
   const navigate = useNavigate();
   const userData = useSelector((state) => state.auth.userData);
 
@@ -65,15 +64,13 @@ export default function PostForm({ post }) {
     return "";
   }, []);
 
-  React.useEffect(() => {
-    const subscription = watch((value, { name }) => {
-      if (name === "title") {
-        setValue("slug", slugTransform(value.title), { shouldValidate: true });
-      }
-    });
+  const titleValue = useWatch({ control, name: "title" });
 
-    return () => subscription.unsubscribe();
-  }, [watch, slugTransform, setValue]);
+  useEffect(() => {
+    setValue("slug", slugTransform(titleValue || ""), {
+      shouldValidate: true,
+    });
+  }, [titleValue, setValue, slugTransform]);
 
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">

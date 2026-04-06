@@ -1,5 +1,5 @@
 import confi from "../confi/confi.js";
-import { Client, ID, Databases, Storage, Query,  } from "appwrite";
+import { Client, ID, Databases, Storage, Query } from "appwrite";
 
 export class Service {
   client = new Client();
@@ -15,99 +15,131 @@ export class Service {
     this.bucket = new Storage(this.client);
   }
 
-  // CREATE POST
+  // ✅ CREATE POST
   async createPost({ title, slug, content, featuredImage, status, userId }) {
     try {
-      return await this.databases.createDocument(
+      const response = await this.databases.createDocument(
         confi.appwriteDatabaseId,
         confi.appwriteCollectionId,
-        slug,
-       { 
+        ID.unique(), // ✅ FIX: unique ID instead of slug
+        {
           title,
+          slug, // keep slug inside data
           content,
           featuredImage,
           status,
           userId,
         }
       );
+
+      return response;
     } catch (error) {
-      console.log("createPost error:", error);
+      console.error("createPost error:", error.message);
+      throw error; // ✅ better debugging
     }
   }
 
-  // UPDATE POST
-  async updatePost(slug, { title, content, featuredImage, status }) {
+  // ✅ UPDATE POST
+  async updatePost(documentId, { title, slug, content, featuredImage, status }) {
     try {
-      return await this.databases.updateDocument({ID:ID.unique(),
-       databaseId: confi.appwriteDatabaseId,
-        collectionId:  confi.appwriteCollectionId,
-       documentId: slug,
-       data: {
+      const response = await this.databases.updateDocument(
+        confi.appwriteDatabaseId,
+        confi.appwriteCollectionId,
+        documentId, // ✅ FIX: use documentId (not slug)
+        {
           title,
+          slug,
           content,
           featuredImage,
           status,
         }
-    });
+      );
+
+      return response;
     } catch (error) {
-      console.log("updatePost error:", error);
+      console.error("updatePost error:", error.message);
+      throw error;
     }
   }
 
-  // DELETE POST
-  async deletePost(slug) {
+  // ✅ DELETE POST
+  async deletePost(documentId) {
     try {
       await this.databases.deleteDocument(
         confi.appwriteDatabaseId,
         confi.appwriteCollectionId,
-        slug
+        documentId // ✅ FIX
       );
       return true;
     } catch (error) {
-      console.log("deletePost error:", error);
+      console.error("deletePost error:", error.message);
       return false;
     }
   }
 
-  // GET SINGLE POST
-  async getPost(slug) {
+  // ✅ GET SINGLE POST
+  async getPost(documentId) {
     try {
-      return await this.databases.getDocument(
+      const response = await this.databases.getDocument(
         confi.appwriteDatabaseId,
         confi.appwriteCollectionId,
-        slug
+        documentId // ✅ FIX
       );
+      return response;
     } catch (error) {
-      console.log("getPost error:", error);
-      return false;
+      console.error("getPost error:", error.message);
+      return null;
     }
   }
 
-  // GET ALL POSTS
+  // ✅ GET ALL POSTS
   async getPosts() {
     try {
-      return await this.databases.listDocuments(
+      const response = await this.databases.listDocuments(
         confi.appwriteDatabaseId,
         confi.appwriteCollectionId,
         [Query.equal("status", "active")]
       );
+      return response;
     } catch (error) {
-      console.log("getPosts error:", error);
-      return false;
+      console.error("getPosts error:", error.message);
+      return null;
     }
   }
 
-  // UPLOAD FILE
+  // ✅ UPLOAD FILE
   async uploadFile(file) {
     try {
-      return await this.bucket.createFile(
+      const response = await this.bucket.createFile(
         confi.appwriteBucketId,
         ID.unique(),
         file
       );
+      return response;
     } catch (error) {
-      console.log("uploadFile error:", error);
+      console.error("uploadFile error:", error.message);
+      return null;
+    }
+  }
+
+  // ✅ DELETE FILE
+  async deleteFile(fileId) {
+    try {
+      await this.bucket.deleteFile(confi.appwriteBucketId, fileId);
+      return true;
+    } catch (error) {
+      console.error("deleteFile error:", error.message);
       return false;
+    }
+  }
+
+  // ✅ FILE PREVIEW
+  getFilePreview(fileId) {
+    try {
+      return this.bucket.getFilePreview(confi.appwriteBucketId, fileId);
+    } catch (error) {
+      console.error("getFilePreview error:", error.message);
+      return null;
     }
   }
 }

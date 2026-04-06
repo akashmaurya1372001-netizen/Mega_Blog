@@ -3,10 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { login as authLogin } from "../Stores/authSlice";
 import { Button, Input, Logo } from "./index";
 import { useDispatch } from "react-redux";
-import authService from "../appwrite/auth";
 import { useForm } from "react-hook-form";
-
-function signup() {
+import authService from "../appwrite/auth";
+function Signup() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { register, handleSubmit } = useForm();
@@ -15,10 +14,11 @@ function signup() {
   const create = async (data) => {
     setError("");
     try {
-      const userData = await authService.createAccount(data);
-      if (userData) {
-        const userData = await authService.getCurrentUser();
-        if (userData) dispatch(login(userData));
+      const createdUser = await authService.createAccount(data);
+      if (createdUser) {
+        await authService.login({ email: data.email, password: data.password });
+        const currentUser = await authService.getCurrentUser();
+        if (currentUser) dispatch(authLogin({ userData: currentUser }));
         navigate("/");
       }
     } catch (error) {
@@ -39,7 +39,7 @@ function signup() {
           Sign up to create account
         </h2>
         <p className="mt-2 text-center text-base text-black/60">
-          Already have an account?&nbsp;
+          Already have an account?
           <Link
             to="/login"
             className="font-medium text-primary transition-all duration-200 hover:underline"
@@ -89,4 +89,4 @@ function signup() {
   );
 }
 
-export default signup;
+export default Signup;
