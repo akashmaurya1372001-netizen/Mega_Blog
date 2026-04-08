@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { Button, Input, RTE, Select } from "..";
-import appwriteService from "../../appwrite/config.js";
+import Service from "../../appwrite/config.js";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-export default function PostForm({ post }) {
+function PostForm({ post }) {
   const { register, handleSubmit, setValue, control, getValues } = useForm({
     defaultValues: {
       title: post?.title || "",
@@ -15,19 +15,19 @@ export default function PostForm({ post }) {
     },
   });
   const navigate = useNavigate();
-  const userData = useSelector((state) => state.auth.userData);
+  const userData = useSelector((state) => state.authentication.userData);
 
   const submit = async (data) => {
     if (post) {
       const file = data.image[0]
-        ? await appwriteService.uploadFile(data.image[0])
+        ? await Service.uploadFile(data.image[0])
         : null;
 
       if (file) {
-        appwriteService.deleteFile(post.featuredImage);
+        Service.deleteFile(post.featuredImage);
       }
 
-      const dbPost = await appwriteService.updatePost(post.$id, {
+      const dbPost = await Service.updatePost(post.$id, {
         ...data,
         featuredImage: file ? file.$id : undefined,
       });
@@ -36,12 +36,12 @@ export default function PostForm({ post }) {
         navigate(`/post/${dbPost.$id}`);
       }
     } else {
-      const file = await appwriteService.uploadFile(data.image[0]);
+      const file = await Service.uploadFile(data.image[0]);
 
       if (file) {
         const fileId = file.$id;
         data.featuredImage = fileId;
-        const dbPost = await appwriteService.createPost({
+        const dbPost = await Service.createPost({
           ...data,
           userId: userData.$id,
         });
@@ -110,7 +110,7 @@ export default function PostForm({ post }) {
         {post && (
           <div className="w-full mb-4">
             <img
-              src={appwriteService.getFilePreview(post.featuredImage)}
+              src={Service.getFilePreview(post.featuredImage)}
               alt={post.title}
               className="rounded-lg"
             />
@@ -133,3 +133,4 @@ export default function PostForm({ post }) {
     </form>
   );
 }
+export default PostForm;

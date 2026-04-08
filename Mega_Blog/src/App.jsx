@@ -1,5 +1,5 @@
 import "./App.css";
-import authService from "./appwrite/auth.js";
+import authService from "./appwrite/authentication.js";
 import { Header, Footer } from "./components";
 import { useDispatch } from "react-redux";
 import { useState, useEffect } from "react";

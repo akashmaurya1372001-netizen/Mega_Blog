@@ -1,23 +1,19 @@
 import conf from "../confi/conf.js";
 import { Client, ID, Databases, Storage, Query } from "appwrite";
-
-export class Service {
+export class Services {
   client = new Client();
   databases;
   bucket;
-
   constructor() {
     this.client
       .setEndpoint(conf.appwriteUrl)
       .setProject(conf.appwriteProjectId);
-
     this.databases = new Databases(this.client);
     this.bucket = new Storage(this.client);
   }
-
   async createPost({ title, slug, content, featuredImage, status, userId }) {
     try {
-      return await this.tableDB.create.row({
+      return await this.tableDB.createRow({
         databaseId: conf.appwriteDatabaseId,
         collectionId: conf.appwriteCollectionId,
         documentId: slug || ID.unique(),
@@ -124,6 +120,5 @@ export class Service {
     });
   }
 }
-
-const service = new Service();
-export default service;
+const Service = new Services();
+export default Service;
